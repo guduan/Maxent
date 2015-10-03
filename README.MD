@@ -1,4 +1,4 @@
-This document contains some information about how to use Maxent.py to do analytical continuation to imaginary-frequency Green's function data. We use Maximum Entropy Method(MEM) based on the paper: *M. Jarrell and J.E. Gubernatis, Phys. Rep. 269 (1996) 133*. 
+This document contains some information about how to use Maxent.py to do analytical continuation to imaginary-frequency Green's function data. We use Maximum Entropy Method(MEM) based on the paper: **M. Jarrell and J.E. Gubernatis, Phys. Rep. 269 (1996) 133**. 
 
 # Requirement:
 ------------
@@ -20,7 +20,7 @@ e.g.
 
 	| w |  G1.real  |   G1.imag |  G2.real|   G2.imag ... |
 	|----------|---------|--------|---------|--------|
-	| 0.1 |    111  |     112   |    121        122
+	| 0.1 |    111  |     112   |    121    |    122 |
     |0.2  |   211   |    212   |    221   |     222|
 	
 

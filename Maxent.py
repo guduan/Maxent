@@ -78,7 +78,7 @@ class Maxent(object):
 
     """
     
-    def __init__(self, filename = "data", column = 41, numRfre = 200, wmin = -15, wmax = 15, defaultModel = "gaussian", tol = 1e-10, std = (False, 1.0), alphamin = -8, alphamax = 0, numAlpha = 100, minimizer = "Bryan"):
+    def __init__(self, filename = "data", column = 41, numRfre = 200, wmin = -15, wmax = 15, defaultModel = "gaussian", tol = 1e-10, std = (False, 1.0), alphamin = -8, alphamax = 0, numAlpha = 100, minimizer = "Bryan", draw = True):
         """
         Contructor
         """
@@ -92,6 +92,7 @@ class Maxent(object):
         self.alphamax = alphamax
         self.numAlpha = numAlpha
         self.minimizer = minimizer
+        self.draw = draw
         self.allSpecFs, self.allProbs = [], []
         self.readfile(filename, column)
         self.aveG, self.stdG = self.calMeanAndStd(self.G)
@@ -193,13 +194,14 @@ class Maxent(object):
         for i in range(len(self.alphas)):
             result.write(str(self.alphas[i]) + '\t' + str(self.allProbs[i]) + "\n")
         result.close()
-        
-        plt.plot(self.w, self.aveSpecFs, "b->", alpha = 0.8, label = "Maxent")
-        plt.xlabel(r"$\omega$")
-        plt.ylabel(r"$A(\omega)$")
-        plt.legend()
-        plt.savefig("./" + dirname + "Comparison.pdf")
-        plt.show()
+
+        if self.draw == True:
+            plt.plot(self.w, self.aveSpecFs, "b->", alpha = 0.8, label = "Maxent")
+            plt.xlabel(r"$\omega$")
+            plt.ylabel(r"$A(\omega)$")
+            plt.legend()
+            plt.savefig("./" + dirname + "Comparison.pdf")
+            plt.show()
             
         
             
@@ -395,8 +397,9 @@ if __name__ == "__main__":
     alphamax: value of maximum alpha in log space
     numAlpha: number of alphas.
     minimizer: "SLSQP" or "Bryan". 
+    draw: whether or not draw the Maxent result graph.
     """
-    Model = Maxent(filename = sys.argv[1], column = 201, numRfre = 201, wmin = -15, wmax = 15, defaultModel = 'gaussian', tol = 1e-5, std = (True, 1.0), alphamin = -1, alphamax = 2.0, numAlpha = 100, minimizer = "Bryan")
+    Model = Maxent(filename = sys.argv[1], column = 201, numRfre = 201, wmin = -15, wmax = 15, defaultModel = 'gaussian', tol = 1e-5, std = (True, 1.0), alphamin = -1, alphamax = 2.0, numAlpha = 100, minimizer = "Bryan", draw = True)
     Model.getAllSpecFs()
     Model.saveObj()
 

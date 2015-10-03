@@ -49,6 +49,7 @@ For different cases, the parameter used in the Maxent.py file should be changed.
 	alphamax: value of maximum alpha in log space
 	numAlpha: number of alphas.
 	minimizer: "SLSQP" or "Bryan".
+	draw: whether or not draw the MEM result graph.
 
 # Contact:
 ----------

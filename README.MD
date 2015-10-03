@@ -19,16 +19,16 @@ where *test.dat* is file that contains data. Here is format that required by *te
 e.g.
 
 | w   |  G1.real|   G1.imag |  G2.real |   G2.imag     | ... |
-|-----|---------|-----------|--------- |--------       | ... |
+|-----|---------|-----------|--------- |--------       | --- |
 | 0.1 |    111  |     112   |    121   |    122        | ... |
 | 0.2 |   211   |    212    |    221   |     222       | ... |
 | ... | ...     |    ...    |    ...   |       ...     | ... |
 	
 
 
-After finishing running the code, it will generate the MaxEnt result graph and some files to store the data. *test.dat.p* is pickle file that stores dictionary data. *test.datComparison.paf* is the Maxent graph file *test.datmaxent.dat* stores the Maxent dat. The first column in it is real frequency and the second column is the spectral function A(w). *test.datPalpha.dat* has the posterior probability distribution of P(alpha|G). The first column is the alpha and the second column is P(alpha|G). These files are enough for publishing purpose.
+After finishing running the code, it will generate the MaxEnt result graph and some files to store the data. *test.dat.p* is pickle file that stores dictionary data. *test.datComparison.paf* is the Maxent graph. *test.datmaxent.dat* stores the Maxent dat. The first column in it is real frequency and the second column is the spectral function A(w). *test.datPalpha.dat* has the posterior probability distribution of P(alpha|G). The first column is the alpha and the second column is P(alpha|G). These files are enough for publishing purpose.
 
-In the *./test/test1* directory, there is alos a *Draw.py* file to plot. Run
+There is also a *Draw.py* file to plot. Run
 > python Draw.py test.dat.p
 
 will create two graphs. One is MEM result and inset is the posterior probability distribution. Another graph is the trend how spectral function evolves with regularization paramter alpha.

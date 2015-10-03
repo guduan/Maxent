@@ -18,10 +18,10 @@ where test.dat is file that contains data. Here is format that required by test.
 
 e.g.
 
-	| w |  G1.real  |   G1.imag |  G2.real|   G2.imag ... |
-	|----------|---------|--------|---------|--------|
-	| 0.1 |    111  |     112   |    121    |    122 |
-    |0.2  |   211   |    212   |    221   |     222|
+| w |  G1.real  |   G1.imag |  G2.real|   G2.imag ... |
+|----------|---------|--------|---------|--------|
+| 0.1 |    111  |     112   |    121    |    122 |
+|0.2  |   211   |    212   |    221   |     222|
 	
 
 

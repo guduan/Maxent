@@ -38,27 +38,16 @@ will create two graphs. One is MEM result and inset is the posterior probability
 For different cases, the parameter used in the Maxent.py file should be changed. In the file, Maxent class has several arguments as input.
 
 	filename: the file that stores imaginary-frenquency Green's function data
-
 	column: number of column in the file, an odd number.
-
 	numRfre: the number of grid for spectral function A(w).
-
 	wmin: minimum real frequency
-
 	wmax: maximun real frequency
-
 	defaultModel: this parameter can be 'gaussian', 'straightline' or 'input'.
-
 	tol: tolerance for minimization. 1e-12 for SLSQP; 1e-5 for Bryan
-
 	std: whether or not use the standard deviation.
-
 	alphamin: value of minimun alpha in log space.
-
 	alphamax: value of maximum alpha in log space
-
 	numAlpha: number of alphas.
-
 	minimizer: "SLSQP" or "Bryan".
 
 

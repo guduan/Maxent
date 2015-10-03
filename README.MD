@@ -35,7 +35,7 @@ will create two graphs. One is MEM result and inset is the posterior probability
 
 # Change Parameter:
 -----------------
-For different cases, the parameter used in the Maxent.py file should be changed. In the file, Maxent class has several arguments as input.
+For different cases, the parameter used in the Maxent.py file should be changed. In the file, Maxent class has several arguments as input in the constructor.
 
 	filename: the file that stores imaginary-frenquency Green's function data
 	column: number of column in the file, an odd number.
@@ -49,5 +49,9 @@ For different cases, the parameter used in the Maxent.py file should be changed.
 	alphamax: value of maximum alpha in log space
 	numAlpha: number of alphas.
 	minimizer: "SLSQP" or "Bryan".
+
+# Contact:
+----------
+* Please contact me: yanfeit89@gmail.com if you need help.
 
 

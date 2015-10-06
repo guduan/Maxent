@@ -14,11 +14,11 @@ In terminal, run *Maxent.py* as:
 or in ipython IDE,
 > %run Maxent.py test.dat
 
-where *test.dat* is file that contains data. Here is format that required by *test.dat*: The first column is real frequency, the second column is the real part of Green's function, the third column is the imaginary part of the Green's function and so forth. The seond and thid column is the first set of Green's function data. And the forth and fifth column is the second set of Green's function data. Please see the *./test/test1/test1.dat* file as a reference.
+where *test.dat* is file that contains data. Here is format that required by *test.dat*: The first column is Matsubara frequency, the second column is the real part of Green's function, the third column is the imaginary part of the Green's function and so forth. The seond and thid column is the first set of Green's function data. And the forth and fifth column is the second set of Green's function data. Please see the *./test/test1/test1.dat* file as a reference.
 
 e.g.
 
-| w   |  G1.real|   G1.imag |  G2.real |   G2.imag     | ... |
+| wn   |  G1.real|   G1.imag |  G2.real |   G2.imag     | ... |
 |-----|---------|-----------|--------- |--------       | --- |
 | 0.1 |    111  |     112   |    121   |    122        | ... |
 | 0.2 |   211   |    212    |    221   |     222       | ... |
@@ -39,6 +39,7 @@ For different cases, the parameter used in the Maxent.py file should be changed.
 
 	filename: the file that stores imaginary-frenquency Green's function data
 	column: number of column in the file, an odd number.
+	numMfre: number of Matsubara frequency used. (this number should be less than the rows in the file)
 	numRfre: the number of grid for spectral function A(w).
 	wmin: minimum real frequency
 	wmax: maximun real frequency

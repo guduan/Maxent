@@ -78,11 +78,12 @@ class Maxent(object):
 
     """
     
-    def __init__(self, filename = "data", column = 41, numRfre = 200, wmin = -15, wmax = 15, defaultModel = "gaussian", tol = 1e-10, std = (False, 1.0), alphamin = -8, alphamax = 0, numAlpha = 100, minimizer = "Bryan", draw = True):
+    def __init__(self, filename = "data", column = 41, numMfre = 50, numRfre = 200, wmin = -15, wmax = 15, defaultModel = "gaussian", tol = 1e-10, std = (False, 1.0), alphamin = -8, alphamax = 0, numAlpha = 100, minimizer = "Bryan", draw = True):
         """
         Contructor
         """
         self.start_time = time.time()
+        self.numMfre = numMfre
         self.numRfre = numRfre
         self.wmin = wmin
         self.wmax = wmax
@@ -93,11 +94,13 @@ class Maxent(object):
         self.numAlpha = numAlpha
         self.minimizer = minimizer
         self.draw = draw
+        self.mu = 1e3
         self.allSpecFs, self.allProbs = [], []
-        self.readfile(filename, column)
-        self.aveG, self.stdG = self.calMeanAndStd(self.G)
-        #self.stdG *= 100
+        self.readfile(filename, column, numMfre)
+        self.calMeanAndStd()
         self.createKernel()
+        self.rotation()
+        self.compUXiV()
         if defaultModel == 'gaussian':
             self.specF = gaussian(self.w)/self.normalize(gaussian(self.w))
             self.defaultM = self.specF
@@ -195,7 +198,7 @@ class Maxent(object):
             result.write(str(self.alphas[i]) + '\t' + str(self.allProbs[i]) + "\n")
         result.close()
 
-        if self.draw == True:
+        if self.draw:
             plt.plot(self.w, self.aveSpecFs, "b->", alpha = 0.8, label = "Maxent")
             plt.xlabel(r"$\omega$")
             plt.ylabel(r"$A(\omega)$")
@@ -205,7 +208,7 @@ class Maxent(object):
             
         
             
-    def readfile(self, filename, column):
+    def readfile(self, filename, column, numMfre):
         """
         read data from file:
         file format:
@@ -226,17 +229,28 @@ class Maxent(object):
                     G.append(b + 1j*c)
                 self.G.append(G)            
         self.wn, self.G = np.array(self.wn), np.array(self.G)
+        rows, cols = self.G.shape
+        self.wn = self.wn[rows/2-numMfre/2+1:rows/2+numMfre/2+1]
+        self.G = self.G[rows/2-numMfre/2+1:rows/2+numMfre/2+1,:]
         inputfile.close()
 
-    def calMeanAndStd(self, G):
+    def calMeanAndStd(self):
         """
-        From data (G) to calculate the average and standard deviation.
+        From data (G) to calculate the average, standard deviation and covariance matrix.
         """
-        self.numMfre, self.numbins = G.shape
-        G_ave = G.mean(1)
-        A = np.array([[G_ave[i]]*self.numbins for i in range(self.numMfre)]).reshape(self.numMfre, self.numbins) - G
-        G_std = np.sqrt(np.sum(np.conjugate(A) * A, axis = 1)/(self.numbins - 1))
-        return G_ave, G_std
+        self.numMfre, self.numbins = self.G.shape
+        self.aveG = self.G.mean(1)
+        A = np.array([[self.aveG[i]]*self.numbins for i in range(self.numMfre)]).reshape(self.numMfre, self.numbins) - self.G
+        self.stdG = np.sqrt(np.sum(np.conjugate(A) * A, axis = 1)/(self.numbins - 1))
+        self.cov = np.zeros([self.numMfre, self.numMfre], dtype = 'complex128')
+        for l in range(self.numMfre):
+            for k in range(self.numMfre):
+                a = 0.0
+                for j in range(self.numbins):
+                    a += (self.aveG[l] - self.G[l][j] ) * (self.aveG[k] - self.G[k][j]).conjugate()
+                self.cov[l][k] = a/self.numbins/(self.numbins-1)
+        
+        
 
     def createKernel(self):
         """
@@ -257,6 +271,22 @@ class Maxent(object):
         for n in range(self.numMfre):
             for m in range(self.numRfre):
                 self.K[n][m] = 1.0/(-self.w[m] + self.wn[n] * 1j)
+
+    def rotation(self):
+        """
+        Rotate the kernel and data into diagonal representation.
+        """
+        w, v = np.linalg.eigh(self.cov)
+        vt = v.transpose().conjugate()
+        self.stdG = np.sqrt(w)
+        self.K = np.dot(vt, self.K)
+        self.aveG = np.dot(vt, self.aveG)
+        
+
+    def compUXiV(self):
+        """
+        Do the sigular value decomposition to the kernel matrix K.
+        """
                 
         self.U, self.Xi, self.Vt = np.linalg.svd(self.K.transpose().conjugate(), full_matrices = 0)
         self.rank = np.linalg.matrix_rank(self.K.transpose().conjugate())
@@ -325,7 +355,6 @@ class Maxent(object):
             n = min(self.numMfre, self.numRfre)
             btemp = np.zeros(self.rank)
             self.specF = self.defaultM
-            mu = 5000.0
             Qold = self.objective(self.defaultM)
 
             while True:
@@ -333,14 +362,14 @@ class Maxent(object):
                 T = np.dot(np.dot(self.Ut, np.diag(self.specF)), self.U)
                 deri = -2.0/self.stdG/self.stdG * (self.aveG - self.restoreG(self.specF))
                 g = np.dot(np.dot(self.Xi, self.Vt), deri)
-                LHS = (self.alpha + mu) * np.diag(np.ones(self.rank)) + np.dot(self.M, T)
+                LHS = (self.alpha + self.mu) * np.diag(np.ones(self.rank)) + np.dot(self.M, T)
                 RHS = -self.alpha * btemp - g
                 deltab = np.dot(inv(LHS), RHS)
                 criteria = np.dot(deltab, np.dot(T, deltab))
 
                 if criteria < 0.2*sum(self.defaultM):
                     #mu *= 0.9
-                
+                    
                     btemp = btemp + deltab
                     al = np.dot(self.U, btemp)
                     self.specF = np.real(self.defaultM * np.exp(al))
@@ -351,8 +380,11 @@ class Maxent(object):
                     continue
                 else:
                 
-                    mu *= 1.1
-                    print "mu is %s" %(mu)
+                    self.mu *= 2
+                    self.specF = self.defaultM
+                    Qold = self.objective(self.defaultM)
+                    btemp = np.zeros(self.rank)
+                    print "mu is %s" %(self.mu)
 
             
 
@@ -387,6 +419,7 @@ if __name__ == "__main__":
     """
     filename: the file that stores imaginary-frenquency Green's function data
     column: number of column in the file, an odd number.
+    numMfre: number of Matsubara frequency used. (this number should be less than the rows in the file)
     numRfre: the number of grid for spectral function A(w).
     wmin: minimum real frequency
     wmax: maximun real frequency
@@ -399,7 +432,7 @@ if __name__ == "__main__":
     minimizer: "SLSQP" or "Bryan". 
     draw: whether or not draw the Maxent result graph.
     """
-    Model = Maxent(filename = sys.argv[1], column = 201, numRfre = 201, wmin = -15, wmax = 15, defaultModel = 'gaussian', tol = 1e-5, std = (True, 1.0), alphamin = -1, alphamax = 2.0, numAlpha = 100, minimizer = "Bryan", draw = True)
+    Model = Maxent(filename = sys.argv[1], column = 201, numMfre = 50, numRfre = 201, wmin = -15, wmax = 15, defaultModel = 'gaussian', tol = 1e-6, std = (True, 1.0), alphamin = -1, alphamax = 2.0, numAlpha = 10, minimizer = "Bryan", draw = True)
     Model.getAllSpecFs()
     Model.saveObj()
 

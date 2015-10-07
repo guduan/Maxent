@@ -75,6 +75,10 @@ class Maxent(object):
         probabilities for each different alpha
     aveSpecFs: ndarry
         the average of the spectral functions
+    mu: float
+        parameter in Levenberg-Marquart algorithms.
+    maxIteration: int
+        Maximum iteration in Lenvenberg-Marquart algorithm.
 
     """
     
@@ -95,6 +99,7 @@ class Maxent(object):
         self.minimizer = minimizer
         self.draw = draw
         self.mu = 1e3
+        self.maxIteration = 1e4
         self.allSpecFs, self.allProbs = [], []
         self.readfile(filename, column, numMfre)
         self.calMeanAndStd()
@@ -218,6 +223,9 @@ class Maxent(object):
         ...
         row
         """
+        if column/2 < 2*numMfre:
+            print "Shut Down immediately! number of samples must be larger than or equal to 2 times of number of Matsubara frequencies."
+            sys.exit(0)
         self.wn, self.G = [], []
         with open(filename, 'r') as inputfile:
             for line in inputfile:
@@ -368,23 +376,28 @@ class Maxent(object):
                 criteria = np.dot(deltab, np.dot(T, deltab))
 
                 if criteria < 0.2*sum(self.defaultM):
-                    #mu *= 0.9
+                
                     
                     btemp = btemp + deltab
                     al = np.dot(self.U, btemp)
                     self.specF = np.real(self.defaultM * np.exp(al))
                     Qnew = self.objective(self.specF)
                     if abs(Qnew - Qold)/Qold < self.tol:
+                        print "{0} iterations in Levenberg-Marquart algorithms, exits properly.".format(iteration)
                         break
                     Qold = Qnew
                     continue
-                else:
+                elif iteration > self.maxIteration:
+                    print "Exceeds maximum iteration in Levenberg-Marquart algorithms, exits. Make tolerance smaller."
+                    break    
                 
+                else:
                     self.mu *= 2
                     self.specF = self.defaultM
                     Qold = self.objective(self.defaultM)
                     btemp = np.zeros(self.rank)
-                    print "mu is %s" %(self.mu)
+                    print "parameter \mu is too small in the Levenberg-Marquart algorithms."
+                    print "\mu is now adjusted to %s" %(self.mu)
 
             
 

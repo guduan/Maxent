@@ -124,7 +124,7 @@ class Maxent(object):
 
     def getAllSpecFs(self):
         """
-        Compute all the spectral functions during a period.
+        Compute all the spectral functions by looping all the alphas.
         """
         self.alphas = np.logspace(self.alphamin, self.alphamax, self.numAlpha)
         self.dalpha = self.alphas[1:] - self.alphas[:-1]
@@ -238,8 +238,8 @@ class Maxent(object):
                 self.G.append(G)            
         self.wn, self.G = np.array(self.wn), np.array(self.G)
         rows, cols = self.G.shape
-        self.wn = self.wn[rows/2-numMfre/2+1:rows/2+numMfre/2+1]
-        self.G = self.G[rows/2-numMfre/2+1:rows/2+numMfre/2+1,:]
+        self.wn = self.wn[rows/2-numMfre/2:rows/2+numMfre/2]
+        self.G = self.G[rows/2-numMfre/2:rows/2+numMfre/2,:]
         inputfile.close()
 
     def calMeanAndStd(self):
@@ -256,7 +256,7 @@ class Maxent(object):
                 a = 0.0
                 for j in range(self.numbins):
                     a += (self.aveG[l] - self.G[l][j] ) * (self.aveG[k] - self.G[k][j]).conjugate()
-                self.cov[l][k] = a/self.numbins/(self.numbins-1)
+                self.cov[l][k] = a/(self.numbins-1)
         
         
 
@@ -338,10 +338,10 @@ class Maxent(object):
         delta = self.aveG - np.dot(self.K, specF * self.dw) 
         if self.std[0]:
             return np.real(np.sum( np.conjugate(delta) * delta/self.stdG/self.stdG )) + \
-                self.alpha * np.sum((specF * np.log(np.abs((specF + 1e-18)/self.defaultM)) + specF -  self.defaultM) * self.dw)
+                self.alpha * np.sum((specF * np.log(np.abs((specF)/self.defaultM)) + specF -  self.defaultM) * self.dw)
         else:
             return np.real(np.sum( np.conjugate(delta) * delta/self.std[1]/self.std[1] )) + \
-                self.alpha * np.sum((specF * np.log(np.abs((specF + 1e-18)/(self.defaultM))) + specF -  self.defaultM) * self.dw)
+                self.alpha * np.sum((specF * np.log(np.abs((specF)/(self.defaultM))) + specF -  self.defaultM) * self.dw)
 
     def getSpecF(self):
         """
@@ -376,21 +376,20 @@ class Maxent(object):
                 criteria = np.dot(deltab, np.dot(T, deltab))
 
                 if criteria < 0.2*sum(self.defaultM):
+                    if iteration > self.maxIteration:
+                        print "Exceeds maximum iteration in Levenberg-Marquart algorithms, exits. Make tolerance smaller."
+                        break 
                 
-                    
                     btemp = btemp + deltab
                     al = np.dot(self.U, btemp)
                     self.specF = np.real(self.defaultM * np.exp(al))
                     Qnew = self.objective(self.specF)
                     if abs(Qnew - Qold)/Qold < self.tol:
-                        print "{0} iterations in Levenberg-Marquart algorithms, exits properly.".format(iteration)
+                        print "{0} iterations in Levenberg-Marquart algorithms. Function evaluted: {1}, it exits properly.".format(iteration, Qnew)
                         break
                     Qold = Qnew
                     continue
-                elif iteration > self.maxIteration:
-                    print "Exceeds maximum iteration in Levenberg-Marquart algorithms, exits. Make tolerance smaller."
-                    break    
-                
+                                    
                 else:
                     self.mu *= 2
                     self.specF = self.defaultM
@@ -420,8 +419,10 @@ class Maxent(object):
         S = np.linalg.eigvalsh(mat_b)
         expo = np.exp(-self.objective(self.specF))
         prod = np.prod(self.alpha/(self.alpha+S))
+    
 
         self.prob = np.sqrt( prod ) * expo/self.alpha
+    
         if np.isnan(self.prob):
             self.prob = 0.0
 
@@ -445,7 +446,7 @@ if __name__ == "__main__":
     minimizer: "SLSQP" or "Bryan". 
     draw: whether or not draw the Maxent result graph.
     """
-    Model = Maxent(filename = sys.argv[1], column = 201, numMfre = 50, numRfre = 201, wmin = -15, wmax = 15, defaultModel = 'gaussian', tol = 1e-6, std = (True, 1.0), alphamin = -1, alphamax = 2.0, numAlpha = 10, minimizer = "Bryan", draw = True)
+    Model = Maxent(filename = sys.argv[1], column = 201, numMfre = 50, numRfre = 201, wmin = -15, wmax = 15, defaultModel = 'gaussian', tol = 1e-5, std = (True, 1.0), alphamin = -1, alphamax = 2, numAlpha = 10, minimizer = "Bryan", draw = True)
     Model.getAllSpecFs()
     Model.saveObj()
 

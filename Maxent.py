@@ -338,10 +338,10 @@ class Maxent(object):
         delta = self.aveG - np.dot(self.K, specF * self.dw) 
         if self.std[0]:
             return np.real(np.sum( np.conjugate(delta) * delta/self.stdG/self.stdG ))/2.0 + \
-                self.alpha * np.sum((specF * np.log(np.abs((specF)/self.defaultM)) + specF -  self.defaultM) * self.dw)
+                self.alpha * np.sum((specF * np.log(np.abs((specF)/self.defaultM)) - specF +  self.defaultM) * self.dw)
         else:
             return np.real(np.sum( np.conjugate(delta) * delta/self.std[1]/self.std[1] ))/2.0 + \
-                self.alpha * np.sum((specF * np.log(np.abs((specF)/(self.defaultM))) + specF -  self.defaultM) * self.dw)
+                self.alpha * np.sum((specF * np.log(np.abs((specF)/(self.defaultM))) - specF +  self.defaultM) * self.dw)
 
     def getSpecF(self):
         """

@@ -98,7 +98,7 @@ class Maxent(object):
         self.numAlpha = numAlpha
         self.minimizer = minimizer
         self.draw = draw
-        self.mu = 1e3
+        self.mu = 0.1
         self.maxIteration = 1e4
         self.allSpecFs, self.allProbs = [], []
         self.readfile(filename, column, numMfre)
@@ -127,6 +127,7 @@ class Maxent(object):
         Compute all the spectral functions by looping all the alphas.
         """
         self.alphas = np.logspace(self.alphamin, self.alphamax, self.numAlpha)
+        # Use uniformed space integral for \int P(alpha)dalpha;
         self.dalpha = self.alphas[1:] - self.alphas[:-1]
         self.dalpha /= 2.0
         self.dalpha = np.insert(self.dalpha, 0, 0.0) + np.append(self.dalpha, 0.0)
@@ -415,7 +416,7 @@ class Maxent(object):
         mat_b = np.zeros((imax, jmax)) + 1j * 0
         for i in range(0, imax):
             for j in range(0, jmax):
-                mat_b[i][j] = vec_a[i] * mat_a[i][j] * vec_a[j]     
+                mat_b[i][j] = vec_a[i] * mat_a[i][j] * vec_a[j] 
         S = np.linalg.eigvalsh(mat_b)
         expo = np.exp(-self.objective(self.specF))
         prod = np.prod(self.alpha/(self.alpha+S))
@@ -446,7 +447,7 @@ if __name__ == "__main__":
     minimizer: "SLSQP" or "Bryan". 
     draw: whether or not draw the Maxent result graph.
     """
-    Model = Maxent(filename = sys.argv[1], column = 201, numMfre = 50, numRfre = 201, wmin = -15, wmax = 15, defaultModel = 'gaussian', tol = 1e-5, std = (True, 1.0), alphamin = -1, alphamax = 2, numAlpha = 10, minimizer = "Bryan", draw = True)
+    Model = Maxent(filename = sys.argv[1], column = 201, numMfre = 50, numRfre = 1001, wmin = -15, wmax = 15, defaultModel = 'gaussian', tol = 1e-5, std = (True, 1.0), alphamin = -1, alphamax = 2, numAlpha = 10, minimizer = "Bryan", draw = True)
     Model.getAllSpecFs()
     Model.saveObj()
 

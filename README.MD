@@ -14,7 +14,7 @@ In terminal, run *Maxent.py* as:
 or in ipython IDE,
 > %run Maxent.py test.dat
 
-where *test.dat* is file that contains data. Here is format that required by *test.dat*: The first column is Matsubara frequency, the second column is the real part of Green's function, the third column is the imaginary part of the Green's function and so forth. The seond and thid column is the first set of Green's function data. And the forth and fifth column is the second set of Green's function data. Please see the *./test/test1/test1.dat* file as a reference.
+where *test.dat* is file that contains data. Here is format that required by *test.dat*: The first column is Matsubara frequency, the second column is the real part of Green's function, the third column is the imaginary part of the Green's function and so forth. The second and third column is the first set of Green's function data. And the forth and fifth column is the second set of Green's function data. Please see the *./test/test1/test1.dat* file as a reference.
 
 e.g.
 
@@ -31,13 +31,13 @@ After finishing running the code, it will generate the MaxEnt result graph and s
 There is also a *Draw.py* file to plot. Run
 > python Draw.py test.dat.p
 
-will create two graphs. One is MEM result and inset is the posterior probability distribution. Another graph is the trend how spectral function evolves with regularization paramter alpha.
+will create two graphs. One is MEM result and inset is the posterior probability distribution. Another graph is the trend how spectral function evolves with regularization parameter alpha.
 
 # Change Parameter:
 -----------------
 For different cases, the parameter used in the Maxent.py file should be changed. In the file, Maxent class has several arguments as input in the constructor.
 
-	filename: the file that stores imaginary-frenquency Green's function data
+	filename: the file that stores imaginary-frequency Green's function data
 	column: number of column in the file, an odd number.
 	numMfre: number of Matsubara frequency used. (this number should be less than the rows in the file)
 	numRfre: the number of grid for spectral function A(w).

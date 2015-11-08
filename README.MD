@@ -26,7 +26,7 @@ e.g.
 	
 
 
-After finishing running the code, it will generate the MaxEnt result graph and some files to store the data. *test.dat.p* is pickle file that stores dictionary data. *test.datComparison.paf* is the Maxent graph. *test.datmaxent.dat* stores the Maxent dat. The first column in it is real frequency and the second column is the spectral function A(w). *test.datPalpha.dat* has the posterior probability distribution of $P(\alpha|G)$. The first column is the alpha and the second column is $P(\alpha|G)$. These files are enough for publishing purpose.
+After finishing running the code, it will generate the MaxEnt result graph and some files to store the data. *test.dat.p* is pickle file that stores dictionary data. *test.datComparison.paf* is the Maxent graph. *test.datmaxent.dat* stores the Maxent dat. The first column in it is real frequency and the second column is the spectral function A(w). *test.datPalpha.dat* has the posterior probability distribution of P(\alpha|G). The first column is the alpha and the second column is P(\alpha|G). These files are enough for publishing purpose.
 
 There is also a *Draw.py* file to plot. Run
 > python Draw.py test.dat.p
@@ -55,5 +55,4 @@ For different cases, the parameter used in the Maxent.py file should be changed.
 # Contact:
 ----------
 * Please contact me: yanfeit89@gmail.com if you need help.
-
 

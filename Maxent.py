@@ -369,7 +369,7 @@ class Maxent(object):
             while True:
                 iteration += 1
                 T = np.dot(np.dot(self.Ut, np.diag(self.specF)), self.U)
-                deri = -2.0/self.stdG/self.stdG * (self.aveG - self.restoreG(self.specF))
+                deri = -1.0/self.stdG/self.stdG * (self.aveG - self.restoreG(self.specF))
                 g = np.dot(np.dot(self.Xi, self.Vt), deri)
                 LHS = (self.alpha + self.mu) * np.diag(np.ones(self.rank)) + np.dot(self.M, T)
                 RHS = -self.alpha * btemp - g
